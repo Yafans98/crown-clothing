@@ -4,7 +4,8 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,//谷歌身份验证
-  createUserWithEmailAndPassword//邮箱密码身份验证
+  createUserWithEmailAndPassword,//邮箱密码身份验证
+  signInWithEmailAndPassword
 } from 'firebase/auth'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -84,4 +85,9 @@ export const createUserDocumentFromAuth = async (userAuth, additionalInformation
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
   return await createUserWithEmailAndPassword(auth, email, password);
+}
+//邮箱密码身份登录
+export const signInWithAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+  return await signInWithEmailAndPassword(auth, email, password);
 }
