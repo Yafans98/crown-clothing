@@ -5,7 +5,9 @@ import {
   signInWithPopup,
   GoogleAuthProvider,//谷歌身份验证
   createUserWithEmailAndPassword,//邮箱密码身份验证
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
 } from 'firebase/auth'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -91,3 +93,9 @@ export const signInWithAuthUserWithEmailAndPassword = async (email, password) =>
   if (!email || !password) return;
   return await signInWithEmailAndPassword(auth, email, password);
 }
+
+//注销
+export const signOutUser = async () => await signOut(auth);
+
+//集中管理
+export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);

@@ -19,15 +19,14 @@ const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
 
-
   //注册完毕后重置表单
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   }
 
   const signInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+    await signInWithGooglePopup();
+
   }
   //提交注册信息
   const handleSubmit = async (e) => {
@@ -35,8 +34,8 @@ const SignInForm = () => {
 
     //向数据库提交信息
     try {
-      const res = await signInWithAuthUserWithEmailAndPassword(email, password);
-      console.log(res);
+      const { user } = await signInWithAuthUserWithEmailAndPassword(email, password);
+      resetFormFields();
     } catch (error) {
       switch (error.code) {
         case 'auth/wrong-password':
@@ -48,7 +47,6 @@ const SignInForm = () => {
         default:
           console.log(error);
       }
-      resetFormFields();
     }
   }
 

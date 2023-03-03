@@ -5,9 +5,8 @@ import {
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth
 } from "../../utils/firebase/firebase.utils";
+
 import './sign-up-form-styles.scss';
-
-
 
 const defaultFormFields = {
   displayName: '',
@@ -37,8 +36,12 @@ const SignUpForm = () => {
     //向数据库提交信息
     try {
       const { user } = await createAuthUserWithEmailAndPassword(email, password);
+
+      //当注册时也会在上下文中设置用户
       await createUserDocumentFromAuth(user, { displayName })
-      console.log(user);
+      resetFormFields();
+
+
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
         alert("cannot create user, email already in use");
@@ -47,7 +50,6 @@ const SignUpForm = () => {
         console.log('user creation encounterd an error', error);
       }
     }
-    resetFormFields();
   }
 
   const handleChange = (e) => {
