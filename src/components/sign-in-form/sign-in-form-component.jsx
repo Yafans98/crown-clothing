@@ -1,9 +1,8 @@
 import { useState } from "react";
 import FormInput from "../form-input/form-input.component";
-import Button from "../button/button.component";
+import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 import {
   signInWithGooglePopup,
-  createUserDocumentFromAuth,
   signInWithAuthUserWithEmailAndPassword
 } from "../../utils/firebase/firebase.utils";
 import './sign-in-form-styles.scss';
@@ -34,7 +33,7 @@ const SignInForm = () => {
 
     //向数据库提交信息
     try {
-      const { user } = await signInWithAuthUserWithEmailAndPassword(email, password);
+      await signInWithAuthUserWithEmailAndPassword(email, password);
       resetFormFields();
     } catch (error) {
       switch (error.code) {
@@ -79,7 +78,10 @@ const SignInForm = () => {
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
           {/* 只能有一个submit按钮,但表单中的按钮默认是submit类型，因此需要人为指定 */}
-          <Button type='button' buttonType={'google'} onClick={signInWithGoogle}>Google sign in</Button>
+          <Button type='button' buttonType={BUTTON_TYPE_CLASSES.google}
+            onClick={signInWithGoogle}>
+            Google sign in
+          </Button>
         </div>
       </form>
     </div>

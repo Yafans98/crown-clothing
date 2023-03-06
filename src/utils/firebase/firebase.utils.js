@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword,//邮箱密码身份验证
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from 'firebase/auth'
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -19,6 +19,13 @@ import {
   doc,
   getDoc,
   setDoc,
+
+  collection,//获取一个collection引用，可DocRef类似
+  writeBatch,//批次写入数据库的方法
+
+  query,
+  getDocs//查询用方法
+
 } from 'firebase/firestore'
 
 
@@ -51,6 +58,40 @@ export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider)
 //数据库
 export const db = getFirestore();
 
+//添加内容到数据库
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+  const collectionRef = collection(db, collectionKey);
+  //新建一个batch
+  const batch = writeBatch(db);
+
+  objectsToAdd.forEach((object) => {
+    //获取document引用
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    //将数据写入docRef,即使Ref不存在，Firebase也会给一个引用，写入操作可直接在这个引用上新建文档并写入
+    batch.set(docRef, object);
+  })
+  //等待写入完成
+  await batch.commit();
+  console.log('done');
+}
+
+//从数据库读取数据
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, 'categories');
+
+  const q = query(collectionRef);
+  const querySnapshot = await getDocs(q);
+  //querySnapshot.docs会返回一个矩阵，就像本地上传时的数据那样(shop-data.js)
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    acc[title.toLowerCase()] = items;
+    return acc;
+  }, {})
+
+  return categoryMap;
+}
+
+//用户登录信息保存
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
   if (!userAuth) return;
   //参数：[数据库，collection名称，唯一ID(标识用)]
