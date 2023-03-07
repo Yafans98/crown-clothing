@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useReducer } from 'react'
+import { createAction } from '../utils/firebase/Reducer/Reducer.utils';
 
 //添加商品到购物车的辅助函数
 const addCartItem = (cartItems, productToAdd) => {
@@ -41,7 +42,10 @@ const clearCartItem = (cartItems, cartItemToClear) => {
   return cartItems.filter(cartItem => cartItem.id !== cartItemToClear.id);
 }
 
-
+const CART_ACTION_TYPES = {
+  SET_CART_ITEMS: 'SET_CART_ITEMS',
+  SET_IS_CART_OPEN: 'SET_IS_CART_OPEN'
+}
 
 export const CartContext = createContext({
   isCartOpen: false,//是否显示购物车
@@ -54,36 +58,69 @@ export const CartContext = createContext({
   cartTotal: 0//总价
 })
 
+const INITIAL_STATE = {
+  isCartOpen: false,
+  cartItems: [],
+  cartCount: 0,
+  cartTotal: 0,
+  setIsCartOpen: () => { }
+}
+
+const cartReducer = (state, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    //只要购物车内商品更新，就变化总数/总价等
+    case CART_ACTION_TYPES.SET_CART_ITEMS:
+      return {
+        ...state,
+        ...payload
+      }
+    case CART_ACTION_TYPES.SET_IS_CART_OPEN:
+      return {
+        ...state,
+        isCartOpen: payload
+      }
+    default:
+      throw new Error(`Unhandle type of ${type} in cartReducer`);
+  }
+}
 export const CartProvider = ({ children }) => {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
-  const [cartTotal, setCartTotal] = useState(0);
+  const [state, dispatch] = useReducer(cartReducer, INITIAL_STATE)
+  const { cartItems, isCartOpen, cartCount, cartTotal } = state;
 
-  useEffect(() => {
-    const newCartCount = cartItems.reduce((total, cartItem) =>
+  //增删改数据库元素
+  const updateCartItemsReducer = (newCartItems) => {
+    const newCartCount = newCartItems.reduce((total, cartItem) =>
       total + cartItem.quantity, 0);
-    setCartCount(newCartCount);
-  }, [cartItems])
-
-  useEffect(() => {
-    const newCartTotal = cartItems.reduce((total, cartItem) =>
+    const newCartTotal = newCartItems.reduce((total, cartItem) =>
       total + cartItem.quantity * cartItem.price, 0);
-    setCartTotal(newCartTotal);
-  }, [cartItems])
+    dispatch(createAction(CART_ACTION_TYPES.SET_CART_ITEMS, {
+      cartItems: newCartItems,
+      cartTotal: newCartTotal,
+      cartCount: newCartCount
+    }
+    )
+    )
+  }
 
-
+  //显示/隐藏购物车
+  const setIsCartOpen = (bool) => {
+    dispatch(createAction(CART_ACTION_TYPES.SET_IS_CART_OPEN, bool))
+  }
 
   const addItemToCart = (productToAdd) => {
-    setCartItems(addCartItem(cartItems, productToAdd))
+    const newCartItems = addCartItem(cartItems, productToAdd);
+    updateCartItemsReducer(newCartItems);
   }
 
   const removeItemFromCart = (cartItemToRemove) => {
-    setCartItems(removeCartItem(cartItems, cartItemToRemove))
+    const newCartItems = removeCartItem(cartItems, cartItemToRemove)
+    updateCartItemsReducer(newCartItems);
   }
 
   const claerItemFromCart = (cartItemToClear) => {
-    setCartItems(clearCartItem(cartItems, cartItemToClear))
+    const newCartItems = clearCartItem(cartItems, cartItemToClear)
+    updateCartItemsReducer(newCartItems);
   }
 
   const value = {
