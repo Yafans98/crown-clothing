@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import CategoriesPreview from '../categories-preview/categories-preview.components'
 import Category from '../category/category.component'
-import { fetchCategoriesAsync } from '../../store/categories/category.action'
+import { fetchCategoriesStart } from '../../store/categories/category.action'
 import { useDispatch } from 'react-redux'
 import './shop.styles.scss'
 
@@ -11,7 +11,7 @@ const Shop = () => {
 
   useEffect(() => {
     //异步获取数据
-    dispatch(fetchCategoriesAsync());
+    dispatch(fetchCategoriesStart());
   }, [dispatch])
 
   return (

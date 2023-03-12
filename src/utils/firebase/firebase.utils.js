@@ -75,8 +75,8 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => 
 }
 
 //从数据库读取数据
-export const getCategoriesAndDocuments = async () => {
-  const collectionRef = collection(db, 'categories');
+export const getCategoriesAndDocuments = async (key) => {
+  const collectionRef = collection(db, key);
 
   const q = query(collectionRef);
   const querySnapshot = await getDocs(q);
@@ -132,3 +132,19 @@ export const signOutUser = async () => await signOut(auth);
 
 //集中管理
 export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
+
+//获取当前用户
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userAuth) => {
+        //获取到值之后直接取消监听，防止监听器始终active，造成内存泄漏
+        unsubscribe();
+        resolve(userAuth);
+      },
+      //第三个参数：当获取用户信息出错时调用的函数，给reject即可
+      reject
+    )
+  })
+}
