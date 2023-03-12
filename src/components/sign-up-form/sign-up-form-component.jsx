@@ -1,12 +1,10 @@
 import { useState } from "react";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
-import {
-  createAuthUserWithEmailAndPassword,
-  createUserDocumentFromAuth
-} from "../../utils/firebase/firebase.utils";
 
 import './sign-up-form-styles.scss';
+import { useDispatch } from "react-redux";
+import { signUpStart } from "../../store/user/user.action";
 
 const defaultFormFields = {
   displayName: '',
@@ -18,7 +16,7 @@ const defaultFormFields = {
 const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
-
+  const dispatch = useDispatch();
 
   //注册完毕后重置表单
   const resetFormFields = () => {
@@ -35,13 +33,8 @@ const SignUpForm = () => {
     }
     //向数据库提交信息
     try {
-      const { user } = await createAuthUserWithEmailAndPassword(email, password);
-
-      //当注册时也会在上下文中设置用户
-      await createUserDocumentFromAuth(user, { displayName })
+      dispatch(signUpStart(email, password, displayName));
       resetFormFields();
-
-
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
         alert("cannot create user, email already in use");

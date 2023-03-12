@@ -16,3 +16,18 @@ export const signInSuccess = (user) => createAction(USER_ACTION_TYPEs.SIGN_IN_SU
 
 export const signInFailed = (error) => createAction(USER_ACTION_TYPEs.SIGN_IN_FAILED, error);
 
+
+//sign-up
+export const signUpStart = (email, password, displayName) =>
+  createAction(USER_ACTION_TYPEs.SIGN_UP_START, { email, password, displayName });
+
+export const signUpSuccess = (user, addtionalDetails) =>
+  createAction(USER_ACTION_TYPEs.SIGN_UP_SUCCESS, { user, addtionalDetails });
+
+export const signUpFailed = (error) =>
+  createAction(USER_ACTION_TYPEs.SIGN_UP_FAILED, error)
+
+//sign-out
+export const signOutStart = () => createAction(USER_ACTION_TYPEs.SIGN_OUT_START);
+export const signOutSuccess = () => createAction(USER_ACTION_TYPEs.SIGN_OUT_SUCCESS);
+export const signOutFailed = (error) => createAction(USER_ACTION_TYPEs.SIGN_OUT_FAILED, error);
