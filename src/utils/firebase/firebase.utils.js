@@ -1,7 +1,6 @@
 //auth服务
 import {
   getAuth,
-  signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,//谷歌身份验证
   createUserWithEmailAndPassword,//邮箱密码身份验证
@@ -41,7 +40,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider();
 
 //自定义谷歌验证身份的行为
@@ -51,8 +50,8 @@ googleProvider.setCustomParameters({
 
 //谷歌身份验证
 export const auth = getAuth();//Firebase自带的身份验证方法
+
 export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
-// export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
 
 
 //数据库
@@ -81,14 +80,7 @@ export const getCategoriesAndDocuments = async () => {
 
   const q = query(collectionRef);
   const querySnapshot = await getDocs(q);
-  //querySnapshot.docs会返回一个矩阵，就像本地上传时的数据那样(shop-data.js)
-  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const { title, items } = docSnapshot.data();
-    acc[title.toLowerCase()] = items;
-    return acc;
-  }, {})
-
-  return categoryMap;
+  return querySnapshot.docs.map(docSnapshot => docSnapshot.data());
 }
 
 //用户登录信息保存
